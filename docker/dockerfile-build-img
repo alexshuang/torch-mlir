@@ -16,10 +16,24 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+RUN wget --no-check-certificate https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 RUN chmod +x Miniconda3-latest-Linux-x86_64.sh
 RUN ./Miniconda3-latest-Linux-x86_64.sh -b
 RUN echo "PATH=/root/miniconda3/bin:$PATH" >> ~/.bashrc
+
+RUN /root/miniconda3/bin/conda create -n torch_mlir python=3.11
+SHELL ["/root/miniconda3/bin/conda", "run", "-n", "torch_mlir", "/bin/bash", "-c"]
+
+# install torch-mlir torchvison
+RUN pip install --upgrade pip
+RUN pip install --pre torch-mlir torchvision \
+  -f https://llvm.github.io/torch-mlir/package-index/ \
+  --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+# install transformers
+RUN pip install transformers
+
+RUN /root/miniconda3/bin/conda init bash
+RUN echo "conda activate torch_mlir" >> ~/.bashrc
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
