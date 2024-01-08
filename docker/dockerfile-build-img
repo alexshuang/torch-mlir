@@ -39,4 +39,5 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 
 WORKDIR /root
 COPY examples examples
+COPY scripts scripts
 
